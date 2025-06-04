@@ -18,15 +18,24 @@ class GameManager:
         self.enemies_to_spawn = []
         self.auto_skip = False  # New auto-skip feature
         self.path = [
-            (100, 50),    # Start further from edge
-            (300, 50),    # Wider horizontal spread
-            (300, 250),   # More vertical space
-            (500, 250),   # Wider middle section
-            (500, 450),   # More vertical space
-            (700, 450),   # Wider end section
-            (700, 650),   # More vertical drop
-            (900, 650)    # End further from edge
-        ]  # Larger, more spread out path
+            (50, 50),     # Start
+            (200, 50),    # First horizontal
+            (200, 150),   # Down
+            (400, 150),   # Right
+            (400, 50),    # Up
+            (600, 50),    # Right
+            (600, 250),   # Long down
+            (400, 250),   # Left
+            (400, 350),   # Down
+            (700, 350),   # Right
+            (700, 450),   # Down
+            (300, 450),   # Long left
+            (300, 550),   # Down
+            (500, 550),   # Right
+            (500, 650),   # Down
+            (800, 650),   # Final stretch
+            (950, 650)    # End
+        ]  # Longer, more complex path with multiple turns
         
     def start_wave(self):
         if self.current_wave >= self.max_waves:
@@ -82,24 +91,30 @@ class GameManager:
             enemy_type, stage = self.enemies_to_spawn.pop(0)
             enemy = None
             
+            # Set wave number for HP scaling
+            wave_number = self.current_wave
+            
             if enemy_type == "rackettra":
                 enemy = Rackettra(self.path)
+                enemy.wave_number = wave_number
             elif enemy_type == "space_rex":
                 enemy = SpaceRex(self.path)
+                enemy.wave_number = wave_number
             elif enemy_type == "enviorollante":
                 enemy = Enviorollante(self.path)
+                enemy.wave_number = wave_number
             elif enemy_type == "hydra_boss":
                 enemy = EmperorHydra(self.path, is_boss=True)
             elif enemy_type == "demolishyah":
-                enemy = Demolishyah(self.path, stage or 1)  # Default to stage 1 if None
+                enemy = Demolishyah(self.path, stage or 1)
             
             if enemy:
                 self.enemies.append(enemy)
                 self.last_spawn_time = current_time
         except Exception as e:
-            print(f"Error spawning enemy: {e}")  # Debug info
-            self.enemies_to_spawn = []  # Clear the wave if there's an error
-            self.game_state = "wave_prep"  # Return to wave preparation
+            print(f"Error spawning enemy: {e}")
+            self.enemies_to_spawn = []
+            self.game_state = "wave_prep"
     
     def update(self):
         current_time = pygame.time.get_ticks()
@@ -114,6 +129,15 @@ class GameManager:
                 self.enemies.remove(enemy)
                 self.cash += self._get_enemy_reward(enemy)
                 continue
+            
+            # Update enemy and handle any special actions
+            enemy_update = enemy.update() if hasattr(enemy, 'update') else None
+            if enemy_update:
+                if enemy_update.get("action") == "damage_base":
+                    self.base_hp -= enemy_update["damage"]
+                    if self.base_hp <= 0:
+                        self.game_state = "game_over"
+                        return
             
             if enemy.move():  # Returns True if reached end
                 self.base_hp -= enemy.damage

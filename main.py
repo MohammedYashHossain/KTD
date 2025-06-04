@@ -127,6 +127,8 @@ class Game:
                             tower.position, tower.target.position,
                             shot_info["damage"], shot_info["effect"]
                         )
+                        if "speed" in shot_info:
+                            projectile.speed = shot_info["speed"]
                         self.game_manager.projectiles.append(projectile)
                     
                     elif shot_info["type"] == "missile":
@@ -135,6 +137,14 @@ class Game:
                             shot_info["damage"], shot_info["aoe_radius"]
                         )
                         self.game_manager.projectiles.append(projectile)
+                    
+                    elif shot_info["type"] == "multi_missile":
+                        for target in shot_info["targets"]:
+                            projectile = Missile(
+                                tower.position, target.position,
+                                shot_info["damage"], shot_info["aoe_radius"]
+                            )
+                            self.game_manager.projectiles.append(projectile)
                     
                     elif shot_info["type"] == "beam":
                         beam = Beam(

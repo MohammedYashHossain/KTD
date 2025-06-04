@@ -40,7 +40,7 @@ class UIManager:
             {"name": "Maser Cannon", "cost": 150, "class": MaserCannon},
             {"name": "Robo Rex", "cost": 250, "class": RoboRex},
             {"name": "Butterflya", "cost": 180, "class": Butterflya},
-            {"name": "Lord Rex", "cost": 350, "class": LordRex}
+            {"name": "Lord Rex", "cost": 500, "class": LordRex}
         ]
         
         # Create buttons

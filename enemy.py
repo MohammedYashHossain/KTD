@@ -6,8 +6,13 @@ class Enemy:
         self.position = Vector2(path[0])  # Start at first point of path
         self.path = path
         self.current_path_index = 0
-        self.hp = hp * 0.6  # Reduce HP by 40%
-        self.max_hp = hp * 0.6
+        # Calculate HP scaling based on wave number (passed from game manager)
+        wave_scaling = 1.0
+        if hasattr(self, 'wave_number'):
+            scaling_factor = (self.wave_number // 5) * 0.2  # 20% increase every 5 waves
+            wave_scaling = 1.0 + scaling_factor
+        self.hp = hp * 0.6 * wave_scaling  # Base reduction + wave scaling
+        self.max_hp = hp * 0.6 * wave_scaling
         self.speed = speed * 0.5  # Reduce speed by 50%
         self.damage = damage
         self.target = Vector2(path[1])  # Next point to move towards
@@ -96,7 +101,7 @@ class SpaceRex(Enemy):
 
 class Enviorollante(Enemy):
     def __init__(self, path):
-        super().__init__(path, hp=150, speed=0.8, damage=15)  # Reduced from 250 HP and 1.2 speed
+        super().__init__(path, hp=150, speed=0.8, damage=15)
         self.heal_timer = 0
         try:
             self.sprite = pygame.image.load("assets/Enviorollante.png")
@@ -107,32 +112,50 @@ class Enviorollante(Enemy):
     
     def update(self):
         self.heal_timer += 1
-        if self.heal_timer >= 60:  # Heal every second
+        if self.heal_timer >= 30:  # Heal every 0.5 seconds (changed from 60)
             self.heal_timer = 0
-            self.hp = min(self.hp + 5, self.max_hp)
+            self.hp = min(self.hp + 8, self.max_hp)  # Increased heal amount from 5 to 8
 
 class EmperorHydra(Enemy):
     def __init__(self, path, is_boss=False):
         if is_boss:
-            # Final boss stats
-            super().__init__(path, hp=2000, speed=0.7, damage=100)  # Massive HP and damage for final boss
+            # Final boss stats - significantly increased HP
+            super().__init__(path, hp=8000, speed=0.7, damage=100)  # Increased from 5000 to 8000 HP
             self.is_boss = True
-            self.lightning_cooldown = 180  # Faster lightning attacks (every 3 seconds)
-            self.regen_amount = 10  # Health regeneration
+            self.lightning_cooldown = 180  # Lightning attack every 3 seconds
+            self.regen_amount = 20  # Increased health regeneration
+            self.base_damage_timer = 0  # Timer for automatic base damage
         else:
-            # Regular Hydra stats (not used in normal waves anymore)
+            # Regular Hydra stats (not used in normal waves)
             super().__init__(path, hp=240, speed=0.9, damage=25)
             self.is_boss = False
-            self.lightning_cooldown = 360  # Normal lightning cooldown (6 seconds)
+            self.lightning_cooldown = 360
             self.regen_amount = 0
         self.lightning_timer = 0
-    
+        
+        try:
+            self.sprite = pygame.image.load("assets/EmperorHydra.png")
+            self.sprite = pygame.transform.scale(self.sprite, (40, 40))
+        except Exception as e:
+            print(f"Error loading EmperorHydra sprite: {e}")
+            self.sprite = None
+
     def update(self):
         self.lightning_timer += 1
         
-        # Boss version regenerates health
-        if self.is_boss and self.lightning_timer % 60 == 0:  # Every second
-            self.hp = min(self.hp + self.regen_amount, self.max_hp)
+        # Boss version regenerates health and damages base
+        if self.is_boss:
+            if self.lightning_timer % 60 == 0:  # Every second
+                self.hp = min(self.hp + self.regen_amount, self.max_hp)
+            
+            # Automatic base damage every 7 seconds
+            self.base_damage_timer += 1
+            if self.base_damage_timer >= 420:  # 7 seconds * 60 frames
+                self.base_damage_timer = 0
+                return {
+                    "action": "damage_base",
+                    "damage": 5
+                }
         
         if self.lightning_timer >= self.lightning_cooldown:
             self.lightning_timer = 0
@@ -145,20 +168,44 @@ class EmperorHydra(Enemy):
 
 class Demolishyah(Enemy):
     def __init__(self, path, stage=1):
-        hp = 600 * stage  # Reduced from 1000 * stage
-        speed = 0.6 + (stage * 0.15)  # Reduced from 1.0 + (stage * 0.2)
+        # Significantly increased HP for each stage
+        hp = 800 * stage  # Increased from 600 * stage
+        speed = 0.6 + (stage * 0.15)
         damage = 50 * stage
         super().__init__(path, hp=hp, speed=speed, damage=damage)
         self.stage = stage
         self.special_timer = 0
+        self.base_damage_timer = 0 if stage == 4 else None  # Only final form has base damage
+        self.regen_amount = 5 if stage == 4 else 0  # Only final form has health regen
+        
+        try:
+            sprite_path = f"assets/Demolishyah_Stage_{stage}.png"
+            self.sprite = pygame.image.load(sprite_path)
+            self.sprite = pygame.transform.scale(self.sprite, (40, 40))
+        except Exception as e:
+            print(f"Error loading Demolishyah stage {stage} sprite: {e}")
+            self.sprite = None
     
     def update(self):
         self.special_timer += 1
+        
+        # Health regeneration for final form
+        if self.stage == 4 and self.special_timer % 60 == 0:  # Every second
+            self.hp = min(self.hp + self.regen_amount, self.max_hp)
+        
+        # Base damage for final form
+        if self.stage == 4:
+            self.base_damage_timer += 1
+            if self.base_damage_timer >= 420:  # 7 seconds * 60 frames
+                self.base_damage_timer = 0
+                return {"action": "damage_base", "damage": 5}
+        
+        # Special abilities
         if self.special_timer >= 300:  # Special ability every 5 seconds
             self.special_timer = 0
             if self.stage == 1:
                 return {"action": "roar", "position": Vector2(self.position)}
             elif self.stage == 2:
                 return {"action": "aoe_attack", "position": Vector2(self.position)}
-            else:  # stage 3 (final form)
+            elif self.stage >= 3:  # Both stage 3 and 4 can summon minions
                 return {"action": "summon_minions", "position": Vector2(self.position)} 

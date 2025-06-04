@@ -87,12 +87,13 @@ class MaserCannon(Tower):
             "type": "maser",
             "damage": self.damage,
             "target": self.target,
-            "effect": {"type": "slow", "amount": 0.5, "duration": 2000}  # 2 seconds
+            "effect": {"type": "slow", "amount": 0.5, "duration": 2000},
+            "speed": 20  # Increased from default
         }
 
 class RoboRex(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=15, range=120, fire_rate=2.0, cost=250)
+        super().__init__(x, y, damage=20, range=120, fire_rate=2.0, cost=250)
         try:
             self.sprite = pygame.image.load("assets/robo_rex.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))
@@ -100,18 +101,34 @@ class RoboRex(Tower):
             print(f"Error loading Robo Rex sprite: {e}")
             self.sprite = None
     
+    def acquire_target(self, enemies):
+        # Override to target up to 3 enemies in range
+        self.targets = []
+        for enemy in enemies:
+            if not enemy.is_alive:
+                continue
+            distance = (enemy.position - self.position).length()
+            if distance <= self.range:
+                self.targets.append(enemy)
+                if len(self.targets) >= 3:  # Maximum 3 targets
+                    break
+        self.target = self.targets[0] if self.targets else None
+    
     def shoot(self, current_time):
         self.last_shot = current_time
+        if not self.targets:
+            return None
+        
         return {
-            "type": "missile",
+            "type": "multi_missile",
             "damage": self.damage,
-            "target": self.target,
+            "targets": self.targets,
             "aoe_radius": 50
         }
 
 class Butterflya(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=4, range=250, fire_rate=0.5, cost=180)  # Lowest damage but fastest fire rate and highest range
+        super().__init__(x, y, damage=3, range=250, fire_rate=0.5, cost=180)  # Reduced damage from 4 to 3
         try:
             self.sprite = pygame.image.load("assets/butterflya.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))
@@ -132,7 +149,7 @@ class Butterflya(Tower):
 
 class LordRex(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=45, range=200, fire_rate=4.0, cost=350)  # Highest damage but slowest fire rate
+        super().__init__(x, y, damage=60, range=200, fire_rate=4.0, cost=500)  # Updated cost to 500
         try:
             self.sprite = pygame.image.load("assets/lord_rex.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))
