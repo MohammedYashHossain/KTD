@@ -51,12 +51,6 @@ class Game:
         self.backgrounds["nyc"].fill((50, 50, 70))  # Dark blue-gray for NYC
         self.backgrounds["future"].fill((0, 0, 50))  # Dark blue for Future
         
-        # Load sprite images
-        self.sprites = {
-            "lord_rex": load_sprite("lord_rex.png"),
-            # Add more sprites here as they become available
-        }
-        
         self.current_theme = "tokyo"
         print("Game initialized successfully")  # Debug output
     
@@ -103,7 +97,13 @@ class Game:
     
     def update(self):
         # Update game state
+        previous_state = self.game_manager.game_state
         self.game_manager.update()
+        
+        # Check for wave completion and show reward
+        if hasattr(self.game_manager, 'wave_reward'):
+            self.ui_manager.show_wave_reward(self.game_manager.wave_reward)
+            delattr(self.game_manager, 'wave_reward')
         
         # Update towers and projectiles
         current_time = pygame.time.get_ticks()
@@ -155,6 +155,17 @@ class Game:
             if isinstance(projectile, Beam):
                 if not projectile.update():
                     self.game_manager.projectiles.remove(projectile)
+                else:
+                    # Handle beam damage to all enemies in its path
+                    beam_rect = pygame.Rect(
+                        min(projectile.start.x, projectile.end.x),
+                        min(projectile.start.y, projectile.end.y),
+                        abs(projectile.end.x - projectile.start.x) or projectile.width,
+                        abs(projectile.end.y - projectile.start.y) or projectile.width
+                    )
+                    for enemy in self.game_manager.enemies:
+                        if enemy.rect.colliderect(beam_rect):
+                            enemy.take_damage(projectile.damage * 0.1)  # Apply damage per frame (10 times per second)
                 continue
             
             if projectile.update():

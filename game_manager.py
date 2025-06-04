@@ -16,6 +16,7 @@ class GameManager:
         self.wave_delay = 1000  # Delay between enemy spawns in ms
         self.last_spawn_time = 0
         self.enemies_to_spawn = []
+        self.auto_skip = False  # New auto-skip feature
         self.path = [
             (100, 50),    # Start further from edge
             (300, 50),    # Wider horizontal spread
@@ -127,6 +128,13 @@ class GameManager:
                 self.game_state = "victory"
             else:
                 self.game_state = "wave_prep"
+                # Add wave completion reward
+                reward = self._get_wave_completion_reward()
+                self.cash += reward
+                # Signal UI to show reward (will be handled in main.py)
+                self.wave_reward = reward
+                if self.auto_skip:  # Auto-start next wave if enabled
+                    self.start_wave()
     
     def _get_enemy_reward(self, enemy):
         if isinstance(enemy, Rackettra):
@@ -140,6 +148,19 @@ class GameManager:
         elif isinstance(enemy, Demolishyah):
             return 50 * enemy.stage
         return 10  # Default reward
+    
+    def _get_wave_completion_reward(self):
+        # Wave completion rewards based on wave ranges
+        if self.current_wave < 10:
+            return 10
+        elif self.current_wave < 20:
+            return 20
+        elif self.current_wave < 30:
+            return 30
+        elif self.current_wave < 40:
+            return 40
+        else:  # waves 40-49
+            return 50
     
     def can_place_tower(self, position, tower_size=40):
         # Check if position is on path
@@ -173,4 +194,16 @@ class GameManager:
             if (pygame.math.Vector2(position) - tower.position).length() < tower_size:
                 return False
         
-        return True 
+        return True
+    
+    def sell_tower(self, position):
+        for tower in self.towers[:]:
+            if tower.rect.collidepoint(position):
+                self.towers.remove(tower)
+                self.cash += tower.get_sell_value()
+                return True
+        return False
+    
+    def toggle_auto_skip(self):
+        self.auto_skip = not self.auto_skip
+        return self.auto_skip 

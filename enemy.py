@@ -14,6 +14,7 @@ class Enemy:
         self.rect = pygame.Rect(self.position.x - 20, self.position.y - 20, 40, 40)
         self.is_alive = True
         self.effects = {}  # Dictionary to store active effects (slow, poison, etc.)
+        self.sprite = None  # Will be set by child classes
     
     def move(self):
         if self.current_path_index >= len(self.path) - 1:
@@ -44,8 +45,12 @@ class Enemy:
         return False
     
     def draw(self, screen):
-        # Draw enemy
-        pygame.draw.rect(screen, (255, 0, 0), self.rect)
+        # Draw enemy sprite or fallback to rectangle
+        if self.sprite:
+            screen.blit(self.sprite, (self.rect.x, self.rect.y))
+        else:
+            pygame.draw.rect(screen, (255, 0, 0), self.rect)
+            
         # Draw health bar
         health_bar_width = 40
         health_percentage = self.hp / self.max_hp
@@ -58,6 +63,12 @@ class Rackettra(Enemy):
     def __init__(self, path):
         super().__init__(path, hp=30, speed=2.0, damage=5)  # Reduced from 50 HP and 3.0 speed
         self.flying = True
+        try:
+            self.sprite = pygame.image.load("assets/Rackettra.png")
+            self.sprite = pygame.transform.scale(self.sprite, (40, 40))
+        except Exception as e:
+            print(f"Error loading Rackettra sprite: {e}")
+            self.sprite = None
     
     def apply_effect(self, effect_type, amount, duration):
         if effect_type == "slow" and self.flying:
@@ -69,6 +80,12 @@ class SpaceRex(Enemy):
     def __init__(self, path):
         super().__init__(path, hp=180, speed=0.7, damage=20)  # Reduced from 300 HP and 1.0 speed
         self.crystal_spawn_timer = 0
+        try:
+            self.sprite = pygame.image.load("assets/Space_Rex.png")
+            self.sprite = pygame.transform.scale(self.sprite, (40, 40))
+        except Exception as e:
+            print(f"Error loading Space Rex sprite: {e}")
+            self.sprite = None
     
     def update(self):
         self.crystal_spawn_timer += 1
@@ -81,6 +98,12 @@ class Enviorollante(Enemy):
     def __init__(self, path):
         super().__init__(path, hp=150, speed=0.8, damage=15)  # Reduced from 250 HP and 1.2 speed
         self.heal_timer = 0
+        try:
+            self.sprite = pygame.image.load("assets/Enviorollante.png")
+            self.sprite = pygame.transform.scale(self.sprite, (40, 40))
+        except Exception as e:
+            print(f"Error loading Enviorollante sprite: {e}")
+            self.sprite = None
     
     def update(self):
         self.heal_timer += 1
