@@ -5,7 +5,7 @@ import math
 class Tower:
     def __init__(self, x, y, damage, range, fire_rate, cost):
         self.position = Vector2(x, y)
-        self.damage = damage
+        self.damage = damage * 1.5  # Increase damage by 50%
         self.range = range
         self.fire_rate = fire_rate
         self.cost = cost
@@ -46,7 +46,7 @@ class Tower:
 
 class Type90Tank(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=5, range=100, fire_rate=1.0, cost=100)
+        super().__init__(x, y, damage=8, range=100, fire_rate=1.0, cost=100)  # Increased from 5 damage
     
     def shoot(self, current_time):
         self.last_shot = current_time
@@ -59,7 +59,7 @@ class Type90Tank(Tower):
 
 class MaserCannon(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=3, range=150, fire_rate=1.5, cost=150)
+        super().__init__(x, y, damage=5, range=150, fire_rate=1.5, cost=150)  # Increased from 3 damage
     
     def shoot(self, current_time):
         self.last_shot = current_time
@@ -72,7 +72,7 @@ class MaserCannon(Tower):
 
 class RoboRex(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=10, range=120, fire_rate=2.0, cost=250)
+        super().__init__(x, y, damage=15, range=120, fire_rate=2.0, cost=250)  # Increased from 10 damage
     
     def shoot(self, current_time):
         self.last_shot = current_time
@@ -91,13 +91,13 @@ class Butterflya(Tower):
         self.last_shot = current_time
         return {
             "type": "heal",
-            "heal_amount": 10,
+            "heal_amount": 15,  # Increased from 10
             "range": self.range
         }
 
 class LordRex(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=20, range=200, fire_rate=3.0, cost=350)
+        super().__init__(x, y, damage=30, range=200, fire_rate=3.0, cost=350)  # Increased from 20 damage
     
     def shoot(self, current_time):
         self.last_shot = current_time

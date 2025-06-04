@@ -21,8 +21,8 @@ class Button:
     def handle_event(self, event):
         if event.type == pygame.MOUSEMOTION:
             self.is_hovered = self.rect.collidepoint(event.pos)
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if self.is_hovered:
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
+            if self.rect.collidepoint(event.pos):
                 return True
         return False
 
@@ -147,14 +147,14 @@ class UIManager:
             y += 60
     
     def handle_events(self, event, game_manager):
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
             if game_manager.game_state == "menu":
-                if self.buttons["start"].handle_event(event):
+                if self.buttons["start"].rect.collidepoint(event.pos):
                     game_manager.game_state = "wave_prep"
                     return True
             
             elif game_manager.game_state == "wave_prep":
-                if self.buttons["next_wave"].handle_event(event):
+                if self.buttons["next_wave"].rect.collidepoint(event.pos):
                     game_manager.start_wave()
                     return True
                 
@@ -165,6 +165,11 @@ class UIManager:
                     return True
         
         elif event.type == pygame.MOUSEMOTION:
+            # Update button hover states
+            if game_manager.game_state == "menu":
+                self.buttons["start"].is_hovered = self.buttons["start"].rect.collidepoint(event.pos)
+            elif game_manager.game_state == "wave_prep":
+                self.buttons["next_wave"].is_hovered = self.buttons["next_wave"].rect.collidepoint(event.pos)
             self.update_tooltip(event.pos, game_manager)
         
         return False 

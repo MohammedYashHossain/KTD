@@ -6,9 +6,9 @@ class Enemy:
         self.position = Vector2(path[0])  # Start at first point of path
         self.path = path
         self.current_path_index = 0
-        self.hp = hp
-        self.max_hp = hp
-        self.speed = speed
+        self.hp = hp * 0.6  # Reduce HP by 40%
+        self.max_hp = hp * 0.6
+        self.speed = speed * 0.5  # Reduce speed by 50%
         self.damage = damage
         self.target = Vector2(path[1])  # Next point to move towards
         self.rect = pygame.Rect(self.position.x - 20, self.position.y - 20, 40, 40)
@@ -56,7 +56,7 @@ class Enemy:
 
 class Rackettra(Enemy):
     def __init__(self, path):
-        super().__init__(path, hp=50, speed=3.0, damage=5)
+        super().__init__(path, hp=30, speed=2.0, damage=5)  # Reduced from 50 HP and 3.0 speed
         self.flying = True
     
     def apply_effect(self, effect_type, amount, duration):
@@ -67,7 +67,7 @@ class Rackettra(Enemy):
 
 class SpaceRex(Enemy):
     def __init__(self, path):
-        super().__init__(path, hp=300, speed=1.0, damage=20)
+        super().__init__(path, hp=180, speed=0.7, damage=20)  # Reduced from 300 HP and 1.0 speed
         self.crystal_spawn_timer = 0
     
     def update(self):
@@ -79,7 +79,7 @@ class SpaceRex(Enemy):
 
 class Enviorollante(Enemy):
     def __init__(self, path):
-        super().__init__(path, hp=250, speed=1.2, damage=15)
+        super().__init__(path, hp=150, speed=0.8, damage=15)  # Reduced from 250 HP and 1.2 speed
         self.heal_timer = 0
     
     def update(self):
@@ -89,21 +89,41 @@ class Enviorollante(Enemy):
             self.hp = min(self.hp + 5, self.max_hp)
 
 class EmperorHydra(Enemy):
-    def __init__(self, path):
-        super().__init__(path, hp=400, speed=1.4, damage=25)
+    def __init__(self, path, is_boss=False):
+        if is_boss:
+            # Final boss stats
+            super().__init__(path, hp=2000, speed=0.7, damage=100)  # Massive HP and damage for final boss
+            self.is_boss = True
+            self.lightning_cooldown = 180  # Faster lightning attacks (every 3 seconds)
+            self.regen_amount = 10  # Health regeneration
+        else:
+            # Regular Hydra stats (not used in normal waves anymore)
+            super().__init__(path, hp=240, speed=0.9, damage=25)
+            self.is_boss = False
+            self.lightning_cooldown = 360  # Normal lightning cooldown (6 seconds)
+            self.regen_amount = 0
         self.lightning_timer = 0
     
     def update(self):
         self.lightning_timer += 1
-        if self.lightning_timer >= 360:  # Lightning every 6 seconds
+        
+        # Boss version regenerates health
+        if self.is_boss and self.lightning_timer % 60 == 0:  # Every second
+            self.hp = min(self.hp + self.regen_amount, self.max_hp)
+        
+        if self.lightning_timer >= self.lightning_cooldown:
             self.lightning_timer = 0
-            return {"action": "lightning_attack", "position": Vector2(self.position)}
+            return {
+                "action": "lightning_attack",
+                "position": Vector2(self.position),
+                "damage": self.damage * 2 if self.is_boss else self.damage
+            }
         return None
 
 class Demolishyah(Enemy):
     def __init__(self, path, stage=1):
-        hp = 1000 * stage
-        speed = 1.0 + (stage * 0.2)
+        hp = 600 * stage  # Reduced from 1000 * stage
+        speed = 0.6 + (stage * 0.15)  # Reduced from 1.0 + (stage * 0.2)
         damage = 50 * stage
         super().__init__(path, hp=hp, speed=speed, damage=damage)
         self.stage = stage

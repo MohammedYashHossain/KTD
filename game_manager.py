@@ -16,9 +16,15 @@ class GameManager:
         self.last_spawn_time = 0
         self.enemies_to_spawn = []
         self.path = [
-            (50, 50), (200, 50), (200, 200), (400, 200),
-            (400, 400), (600, 400), (600, 600), (800, 600)
-        ]  # Example path, should be customized
+            (100, 50),    # Start further from edge
+            (300, 50),    # Wider horizontal spread
+            (300, 250),   # More vertical space
+            (500, 250),   # Wider middle section
+            (500, 450),   # More vertical space
+            (700, 450),   # Wider end section
+            (700, 650),   # More vertical drop
+            (900, 650)    # End further from edge
+        ]  # Larger, more spread out path
         
     def start_wave(self):
         if self.current_wave >= self.max_waves:
@@ -33,47 +39,36 @@ class GameManager:
     def _generate_wave(self):
         enemies = []
         
+        # Boss waves
+        if self.current_wave == 10:
+            return [("demolishyah", 1)]  # First boss at wave 10
+        elif self.current_wave == 20:
+            return [("demolishyah", 2)]  # Second boss at wave 20
+        elif self.current_wave == 30:
+            return [("demolishyah", 3)]  # Third boss at wave 30
+        elif self.current_wave == 40:
+            return [("demolishyah", 4)]  # Fourth boss at wave 40
+        elif self.current_wave == 50:
+            return [("hydra_boss", 1)]  # Final boss with stage parameter
+        
+        # Regular waves have enemies equal to the wave number
+        num_enemies = min(self.current_wave, 15)  # Cap regular wave enemies at 15
+        
         # Adjust wave_delay based on wave number
         self.wave_delay = max(500, 1000 - (self.current_wave * 10))
         
-        if self.current_wave <= 10:
-            # Waves 1-10: Only Rackettra
-            count = 5 + (self.current_wave // 2)
-            for _ in range(count):
-                enemies.append(("rackettra", None))
+        # Choose enemy types based on wave progression
+        available_enemies = ["rackettra"]  # Always have at least one enemy type
         
-        elif self.current_wave <= 20:
-            # Waves 11-20: Mix of Rackettra, Space Rex, and Enviorollante
-            count = 8 + (self.current_wave // 2)
-            for _ in range(count):
-                enemy_type = pygame.random.choice(["rackettra", "space_rex", "enviorollante"])
-                enemies.append((enemy_type, None))
+        if self.current_wave > 10:
+            available_enemies.append("space_rex")
+        if self.current_wave > 20:
+            available_enemies.append("enviorollante")
         
-        elif self.current_wave <= 30:
-            # Waves 21-30: All types including Hydra
-            count = 12 + (self.current_wave // 2)
-            for _ in range(count):
-                enemy_type = pygame.random.choice(
-                    ["rackettra", "space_rex", "enviorollante", "hydra"]
-                )
-                enemies.append((enemy_type, None))
-        
-        elif self.current_wave <= 49:
-            # Waves 31-49: Fast waves with all types
-            count = min(30, 15 + self.current_wave // 2)
-            for _ in range(count):
-                enemy_type = pygame.random.choice(
-                    ["rackettra", "space_rex", "enviorollante", "hydra"]
-                )
-                enemies.append((enemy_type, None))
-        
-        # Boss waves
-        if self.current_wave == 25:
-            enemies = [("demolishyah", 1)] * 1 + enemies
-        elif self.current_wave == 40:
-            enemies = [("demolishyah", 2)] * 1 + enemies
-        elif self.current_wave == 50:
-            enemies = [("demolishyah", 3)] * 1 + enemies[:10]  # Final boss + limited enemies
+        # Generate enemies
+        for _ in range(num_enemies):
+            enemy_type = pygame.random.choice(available_enemies)
+            enemies.append((enemy_type, None))
         
         return enemies
     
@@ -81,23 +76,28 @@ class GameManager:
         if not self.enemies_to_spawn or current_time - self.last_spawn_time < self.wave_delay:
             return
         
-        enemy_type, stage = self.enemies_to_spawn.pop(0)
-        enemy = None
-        
-        if enemy_type == "rackettra":
-            enemy = Rackettra(self.path)
-        elif enemy_type == "space_rex":
-            enemy = SpaceRex(self.path)
-        elif enemy_type == "enviorollante":
-            enemy = Enviorollante(self.path)
-        elif enemy_type == "hydra":
-            enemy = EmperorHydra(self.path)
-        elif enemy_type == "demolishyah":
-            enemy = Demolishyah(self.path, stage)
-        
-        if enemy:
-            self.enemies.append(enemy)
-            self.last_spawn_time = current_time
+        try:
+            enemy_type, stage = self.enemies_to_spawn.pop(0)
+            enemy = None
+            
+            if enemy_type == "rackettra":
+                enemy = Rackettra(self.path)
+            elif enemy_type == "space_rex":
+                enemy = SpaceRex(self.path)
+            elif enemy_type == "enviorollante":
+                enemy = Enviorollante(self.path)
+            elif enemy_type == "hydra_boss":
+                enemy = EmperorHydra(self.path, is_boss=True)
+            elif enemy_type == "demolishyah":
+                enemy = Demolishyah(self.path, stage or 1)  # Default to stage 1 if None
+            
+            if enemy:
+                self.enemies.append(enemy)
+                self.last_spawn_time = current_time
+        except Exception as e:
+            print(f"Error spawning enemy: {e}")  # Debug info
+            self.enemies_to_spawn = []  # Clear the wave if there's an error
+            self.game_state = "wave_prep"  # Return to wave preparation
     
     def update(self):
         current_time = pygame.time.get_ticks()
