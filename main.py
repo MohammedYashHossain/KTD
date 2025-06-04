@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 from pygame.locals import *
 from game_manager import GameManager
 from ui_manager import UIManager
@@ -18,8 +19,20 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY = (50, 50, 50)
 
+# Asset loading
+def load_sprite(filename, size=(40, 40)):
+    try:
+        image = pygame.image.load(os.path.join('assets', filename))
+        return pygame.transform.scale(image, size)
+    except:
+        # Create a default colored rectangle if image loading fails
+        surface = pygame.Surface(size)
+        surface.fill((100, 100, 100))
+        return surface
+
 class Game:
     def __init__(self):
+        print("Initializing game...")  # Debug output
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Kaiju Tower Defense")
         self.clock = pygame.time.Clock()
@@ -38,15 +51,26 @@ class Game:
         self.backgrounds["nyc"].fill((50, 50, 70))  # Dark blue-gray for NYC
         self.backgrounds["future"].fill((0, 0, 50))  # Dark blue for Future
         
+        # Load sprite images
+        self.sprites = {
+            "lord_rex": load_sprite("lord_rex.png"),
+            # Add more sprites here as they become available
+        }
+        
         self.current_theme = "tokyo"
+        print("Game initialized successfully")  # Debug output
     
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == QUIT:
                 self.running = False
+                return
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    self.running = False
+                    if self.game_manager.game_state == "menu":
+                        self.running = False
+                    else:
+                        self.game_manager.game_state = "menu"
                 elif event.key == K_t:  # Change theme
                     themes = list(self.backgrounds.keys())
                     current_index = themes.index(self.current_theme)
@@ -69,8 +93,13 @@ class Game:
                     self.ui_manager.selected_tower = None
                     self.ui_manager.show_tower_range = False
             
-            # Handle UI events
-            self.ui_manager.handle_events(event, self.game_manager)
+            try:
+                # Handle UI events
+                self.ui_manager.handle_events(event, self.game_manager)
+            except Exception as e:
+                print(f"Error in UI event handling: {e}")  # Debug output
+                import traceback
+                traceback.print_exc()
     
     def update(self):
         # Update game state
@@ -220,13 +249,24 @@ class Game:
         pygame.display.flip()
     
     def run(self):
+        print("Starting game loop...")  # Debug output
         while self.running:
-            self.handle_events()
-            self.update()
-            self.draw()
-            self.clock.tick(FPS)
+            try:
+                self.handle_events()
+                self.update()
+                self.draw()
+                self.clock.tick(FPS)
+            except Exception as e:
+                print(f"Error in game loop: {e}")  # Debug output
+                import traceback
+                traceback.print_exc()
+                self.running = False
 
 def main():
+    # Create assets directory if it doesn't exist
+    if not os.path.exists('assets'):
+        os.makedirs('assets')
+        
     game = Game()
     game.run()
     pygame.quit()

@@ -1,4 +1,5 @@
 import pygame
+import random
 from enemy import Rackettra, SpaceRex, Enviorollante, EmperorHydra, Demolishyah
 
 class GameManager:
@@ -67,7 +68,7 @@ class GameManager:
         
         # Generate enemies
         for _ in range(num_enemies):
-            enemy_type = pygame.random.choice(available_enemies)
+            enemy_type = random.choice(available_enemies)
             enemies.append((enemy_type, None))
         
         return enemies
