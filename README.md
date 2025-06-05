@@ -1,4 +1,37 @@
-y
+# Kaiju Tower Defense 🎮
+
+A Python-based tower defense game featuring giant monsters (kaiju) and strategic defense mechanics. Built with Pygame, this project demonstrates object-oriented programming, game development, and real-time system design.
+
+## 🌟 Features
+
+- **Dynamic Combat System**: Multiple tower types with unique abilities and attack patterns
+- **Strategic Gameplay**: Various enemy types with different behaviors and abilities
+- **Boss Battles**: Special boss waves featuring powerful kaiju
+- **Resource Management**: Economy system for tower placement and upgrades
+- **Modern UI/UX**: Clean interface with informative HUD and tooltips
+- **Audio Integration**: Background music and sound effects for immersive gameplay
+
+## 🛠️ Technical Highlights
+
+- **Object-Oriented Design**: Modular architecture with clear separation of concerns
+- **Event System**: Robust event handling for game state management
+- **Collision Detection**: Efficient implementation of hitbox and projectile systems
+- **Path Finding**: Enemy movement system with predefined paths
+- **Resource Management**: Memory-efficient asset loading and management
+- **Performance Optimization**: Efficient rendering and update cycles
+
+## 🔧 Technologies Used
+
+- Python 3.x
+- Pygame
+- Vector2D Mathematics
+- Asset Management
+- Event Systems
+
+## 🎯 Learning Outcomes
+
+- Game development architecture and patterns
+- Real-time system design and optimization
 - Object-oriented programming principles
 - Event-driven programming
 - Asset management and resource handling
