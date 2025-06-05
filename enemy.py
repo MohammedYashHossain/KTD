@@ -83,7 +83,7 @@ class Rackettra(Enemy):
 
 class SpaceRex(Enemy):
     def __init__(self, path):
-        super().__init__(path, hp=180, speed=0.7, damage=20)  # Reduced from 300 HP and 1.0 speed
+        super().__init__(path, hp=180, speed=1.0, damage=20)  # Increased speed from 0.7 to 1.0 (still slower than Rackettra's 2.0)
         self.crystal_spawn_timer = 0
         try:
             self.sprite = pygame.image.load("assets/Space_Rex.png")
@@ -98,6 +98,24 @@ class SpaceRex(Enemy):
             self.crystal_spawn_timer = 0
             return {"action": "spawn_crystal", "position": Vector2(self.position)}
         return None
+
+    def take_damage(self, amount):
+        self.hp -= amount
+        if self.hp <= 0:
+            self.is_alive = False
+            # If this is a boss (determined by wave number in game manager)
+            if hasattr(self, 'wave_number') and self.wave_number in [30, 40]:
+                # Spawn 3 regular enemies on death
+                return {
+                    "action": "spawn_on_death",
+                    "enemies": [
+                        {"type": "Rackettra", "position": Vector2(self.position)},
+                        {"type": "SpaceRex", "position": Vector2(self.position)},
+                        {"type": "Enviorollante", "position": Vector2(self.position)}
+                    ]
+                }
+            return True
+        return False
 
 class Enviorollante(Enemy):
     def __init__(self, path):
@@ -118,19 +136,15 @@ class Enviorollante(Enemy):
 
 class EmperorHydra(Enemy):
     def __init__(self, path, is_boss=False):
-        if is_boss:
-            # Final boss stats - significantly increased HP
-            super().__init__(path, hp=8000, speed=0.7, damage=100)  # Increased from 5000 to 8000 HP
-            self.is_boss = True
-            self.lightning_cooldown = 180  # Lightning attack every 3 seconds
-            self.regen_amount = 20  # Increased health regeneration
-            self.base_damage_timer = 0  # Timer for automatic base damage
-        else:
-            # Regular Hydra stats (not used in normal waves)
-            super().__init__(path, hp=240, speed=0.9, damage=25)
-            self.is_boss = False
-            self.lightning_cooldown = 360
-            self.regen_amount = 0
+        # Final boss stats
+        hp = 8000 if is_boss else 240
+        speed = 0.7 if is_boss else 0.9
+        damage = 100 if is_boss else 25
+        super().__init__(path, hp=hp, speed=speed, damage=damage)
+        self.is_boss = is_boss
+        self.lightning_cooldown = 180 if is_boss else 360
+        self.regen_amount = 20 if is_boss else 0
+        self.base_damage_timer = 0 if is_boss else None
         self.lightning_timer = 0
         
         try:
@@ -165,6 +179,32 @@ class EmperorHydra(Enemy):
                 "damage": self.damage * 2 if self.is_boss else self.damage
             }
         return None
+
+    def take_damage(self, amount):
+        self.hp -= amount
+        if self.hp <= 0:
+            self.is_alive = False
+            # If this is a boss (determined by wave number in game manager)
+            if hasattr(self, 'wave_number') and self.wave_number in [30, 40]:
+                # Spawn 4 enemies on death for boss version
+                return {
+                    "action": "spawn_on_death",
+                    "enemies": [
+                        {"type": "Rackettra", "position": Vector2(self.position)},
+                        {"type": "SpaceRex", "position": Vector2(self.position)},
+                        {"type": "Enviorollante", "position": Vector2(self.position)},
+                        {"type": "EmperorHydra", "position": Vector2(self.position)}
+                    ]
+                }
+            return True
+        return False
+
+    def __init__(self):
+        super().__init__(path, hp=hp, speed=speed, damage=damage)
+        # Add wave number scaling after round 35
+        if hasattr(self, 'wave_number') and self.wave_number > 35:
+            self.hp *= 2  # Double health after round 35
+            self.max_hp *= 2  # Also double max health to maintain health bar display
 
 class Demolishyah(Enemy):
     def __init__(self, path, stage=1):

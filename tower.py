@@ -102,7 +102,7 @@ class RoboRex(Tower):
             self.sprite = None
     
     def acquire_target(self, enemies):
-        # Override to target up to 3 enemies in range
+        # Get all enemies in range
         self.targets = []
         for enemy in enemies:
             if not enemy.is_alive:
@@ -110,8 +110,7 @@ class RoboRex(Tower):
             distance = (enemy.position - self.position).length()
             if distance <= self.range:
                 self.targets.append(enemy)
-                if len(self.targets) >= 3:  # Maximum 3 targets
-                    break
+        # Set primary target as the first enemy in range (for visual targeting)
         self.target = self.targets[0] if self.targets else None
     
     def shoot(self, current_time):
@@ -119,11 +118,20 @@ class RoboRex(Tower):
         if not self.targets:
             return None
         
+        # Create a central explosion point (either at the first target or center of mass)
+        if self.target:
+            explosion_center = Vector2(self.target.position)
+        else:
+            # Calculate center of mass of all targets as fallback
+            center_x = sum(target.position.x for target in self.targets) / len(self.targets)
+            center_y = sum(target.position.y for target in self.targets) / len(self.targets)
+            explosion_center = Vector2(center_x, center_y)
+        
         return {
-            "type": "multi_missile",
+            "type": "missile",  # Changed to single missile with larger AOE
             "damage": self.damage,
-            "targets": self.targets,
-            "aoe_radius": 50
+            "target": explosion_center,  # Target the explosion center
+            "aoe_radius": self.range * 0.8  # AOE radius is 80% of tower range
         }
 
 class Butterflya(Tower):
@@ -149,7 +157,7 @@ class Butterflya(Tower):
 
 class LordRex(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=60, range=200, fire_rate=4.0, cost=500)  # Updated cost to 500
+        super().__init__(x, y, damage=80, range=200, fire_rate=6.0, cost=750)  # Increased fire_rate from 4.0 to 6.0 seconds, increased damage to compensate
         try:
             self.sprite = pygame.image.load("assets/lord_rex.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))

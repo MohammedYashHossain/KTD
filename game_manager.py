@@ -51,16 +51,22 @@ class GameManager:
         enemies = []
         
         # Boss waves
-        if self.current_wave == 10:
-            return [("demolishyah", 1)]  # First boss at wave 10
-        elif self.current_wave == 20:
-            return [("demolishyah", 2)]  # Second boss at wave 20
-        elif self.current_wave == 30:
-            return [("demolishyah", 3)]  # Third boss at wave 30
-        elif self.current_wave == 40:
-            return [("demolishyah", 4)]  # Fourth boss at wave 40
-        elif self.current_wave == 50:
-            return [("hydra_boss", 1)]  # Final boss with stage parameter
+        if self.current_wave in [10, 20, 30, 40, 50]:
+            # Set boss wave notification
+            self.boss_wave_notification = True
+            
+            if self.current_wave == 10:
+                return [("demolishyah", 1)]  # First boss at wave 10
+            elif self.current_wave == 20:
+                return [("demolishyah", 2)]  # Second boss at wave 20
+            elif self.current_wave == 30:
+                return [("demolishyah", 3)]  # Third boss at wave 30
+            elif self.current_wave == 40:
+                return [("demolishyah", 4)]  # Fourth boss at wave 40
+            elif self.current_wave == 50:
+                return [("hydra_boss", 1)]  # Final boss with stage parameter
+        else:
+            self.boss_wave_notification = False
         
         # Regular waves have enemies equal to the wave number
         num_enemies = min(self.current_wave, 15)  # Cap regular wave enemies at 15
@@ -97,16 +103,30 @@ class GameManager:
             if enemy_type == "rackettra":
                 enemy = Rackettra(self.path)
                 enemy.wave_number = wave_number
+                # Apply 2x health scaling after round 35
+                if wave_number > 35:
+                    enemy.hp *= 2
+                    enemy.max_hp *= 2
             elif enemy_type == "space_rex":
                 enemy = SpaceRex(self.path)
                 enemy.wave_number = wave_number
+                # Apply 2x health scaling after round 35
+                if wave_number > 35:
+                    enemy.hp *= 2
+                    enemy.max_hp *= 2
             elif enemy_type == "enviorollante":
                 enemy = Enviorollante(self.path)
                 enemy.wave_number = wave_number
+                # Apply 2x health scaling after round 35
+                if wave_number > 35:
+                    enemy.hp *= 2
+                    enemy.max_hp *= 2
             elif enemy_type == "hydra_boss":
                 enemy = EmperorHydra(self.path, is_boss=True)
+                enemy.wave_number = wave_number
             elif enemy_type == "demolishyah":
                 enemy = Demolishyah(self.path, stage or 1)
+                enemy.wave_number = wave_number
             
             if enemy:
                 self.enemies.append(enemy)

@@ -5,6 +5,8 @@ from pygame.locals import *
 from game_manager import GameManager
 from ui_manager import UIManager
 from projectile import Bullet, Maser, Missile, Beam, HealEffect
+from enemy import Rackettra, SpaceRex, Enviorollante, EmperorHydra, Demolishyah
+import random
 
 # Initialize Pygame
 pygame.init()
@@ -41,19 +43,70 @@ class Game:
         self.game_manager = GameManager()
         self.ui_manager = UIManager(WINDOW_WIDTH, WINDOW_HEIGHT)
         
-        # Load background images (placeholder colors for now)
-        self.backgrounds = {
-            "tokyo": pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT)),
-            "nyc": pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT)),
-            "future": pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
-        }
-        self.backgrounds["tokyo"].fill((0, 50, 0))  # Dark green for Tokyo
-        self.backgrounds["nyc"].fill((50, 50, 70))  # Dark blue-gray for NYC
-        self.backgrounds["future"].fill((0, 0, 50))  # Dark blue for Future
+        # Create city background
+        self.background = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.create_city_background()
         
-        self.current_theme = "tokyo"
         print("Game initialized successfully")  # Debug output
     
+    def create_city_background(self):
+        # Base background color (dark gray)
+        self.background.fill((40, 40, 40))
+        
+        # Draw roads (lighter gray)
+        road_color = (70, 70, 70)
+        # Main roads following the path
+        for i in range(len(self.game_manager.path) - 1):
+            start = self.game_manager.path[i]
+            end = self.game_manager.path[i + 1]
+            pygame.draw.line(self.background, road_color, start, end, 40)
+        
+        # Building placeholders (various gray tones)
+        building_colors = [
+            (60, 60, 65),  # Dark gray
+            (80, 80, 85),  # Medium gray
+            (100, 100, 105),  # Light gray
+        ]
+        
+        # Add building blocks avoiding the path
+        building_sizes = [(60, 60), (80, 80), (100, 100)]
+        for x in range(0, WINDOW_WIDTH, 120):
+            for y in range(0, WINDOW_HEIGHT, 120):
+                # Check if position is far enough from path
+                can_place = True
+                for i in range(len(self.game_manager.path) - 1):
+                    start = pygame.math.Vector2(self.game_manager.path[i])
+                    end = pygame.math.Vector2(self.game_manager.path[i + 1])
+                    pos = pygame.math.Vector2(x + 30, y + 30)
+                    if self.point_to_line_distance(pos, start, end) < 60:
+                        can_place = False
+                        break
+                
+                if can_place:
+                    color = building_colors[random.randint(0, len(building_colors)-1)]
+                    size = building_sizes[random.randint(0, len(building_sizes)-1)]
+                    pygame.draw.rect(self.background, color, 
+                                   (x, y, size[0], size[1]))
+                    # Add windows (lighter gray)
+                    window_color = (120, 120, 125)
+                    window_size = 8
+                    for wx in range(x + 10, x + size[0] - 10, 20):
+                        for wy in range(y + 10, y + size[1] - 10, 20):
+                            pygame.draw.rect(self.background, window_color,
+                                          (wx, wy, window_size, window_size))
+
+    def point_to_line_distance(self, point, line_start, line_end):
+        # Calculate distance from point to line segment
+        line_vec = line_end - line_start
+        point_vec = point - line_start
+        line_length = line_vec.length()
+        if line_length == 0:
+            return point_vec.length()
+        
+        t = max(0, min(1, point_vec.dot(line_vec) / (line_length * line_length)))
+        projection = line_start + line_vec * t
+        return (point - projection).length()
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -209,13 +262,16 @@ class Game:
     
     def draw(self):
         # Draw background
-        self.screen.blit(self.backgrounds[self.current_theme], (0, 0))
+        self.screen.blit(self.background, (0, 0))
         
-        # Draw path
+        # Draw path highlights
         for i in range(len(self.game_manager.path) - 1):
             start_pos = self.game_manager.path[i]
             end_pos = self.game_manager.path[i + 1]
-            pygame.draw.line(self.screen, WHITE, start_pos, end_pos, 40)
+            # Draw path border
+            pygame.draw.line(self.screen, (100, 100, 100), start_pos, end_pos, 42)
+            # Draw path center
+            pygame.draw.line(self.screen, (80, 80, 80), start_pos, end_pos, 40)
         
         # Draw towers
         for tower in self.game_manager.towers:

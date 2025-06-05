@@ -39,8 +39,8 @@ class UIManager:
             {"name": "Type 90 Tank", "cost": 100, "class": Type90Tank},
             {"name": "Maser Cannon", "cost": 150, "class": MaserCannon},
             {"name": "Robo Rex", "cost": 250, "class": RoboRex},
-            {"name": "Butterflya", "cost": 180, "class": Butterflya},
-            {"name": "Lord Rex", "cost": 500, "class": LordRex}
+            {"name": "Butterflya", "cost": 200, "class": Butterflya},
+            {"name": "Lord Rex", "cost": 750, "class": LordRex}
         ]
         
         # Create buttons
@@ -91,6 +91,16 @@ class UIManager:
         # Draw base HP
         hp_text = self.font.render(f"Base HP: {game_manager.base_hp}", True, (255, 100, 100))
         screen.blit(hp_text, (400, 10))
+        
+        # Draw boss wave notification in bottom right if active
+        if hasattr(game_manager, 'boss_wave_notification') and game_manager.boss_wave_notification:
+            boss_text = self.font.render("BOSS WAVE!", True, (255, 0, 0))
+            text_rect = boss_text.get_rect(bottomright=(self.screen_width - 10, self.screen_height - 10))
+            # Draw background for better visibility
+            bg_rect = text_rect.inflate(20, 10)
+            pygame.draw.rect(screen, (0, 0, 0), bg_rect)
+            pygame.draw.rect(screen, (255, 0, 0), bg_rect, 2)
+            screen.blit(boss_text, text_rect)
         
         # Always draw auto-skip button
         self.buttons["auto_skip"].draw(screen, self.font)
