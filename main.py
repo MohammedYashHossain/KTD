@@ -8,6 +8,8 @@ from projectile import Bullet, Maser, Missile, Beam, HealEffect
 from enemy import Rackettra, SpaceRex, Enviorollante, EmperorHydra, Demolishyah
 import random
 
+# Created By: Mohammed Hossaim
+
 # Initialize Pygame
 pygame.init()
 
