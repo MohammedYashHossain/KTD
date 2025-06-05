@@ -8,34 +8,34 @@ class GameManager:
         self.max_waves = 50
         self.cash = 200
         self.base_hp = 100
-        self.game_state = "menu"  # menu, wave_prep, playing, game_over
+        self.game_state = "menu"  
         self.enemies = []
         self.towers = []
         self.projectiles = []
         self.effects = []
-        self.wave_delay = 1000  # Delay between enemy spawns in ms
+        self.wave_delay = 1000  
         self.last_spawn_time = 0
         self.enemies_to_spawn = []
-        self.auto_skip = False  # New auto-skip feature
+        self.auto_skip = False  
         self.path = [
-            (50, 50),     # Start
-            (200, 50),    # First horizontal
-            (200, 150),   # Down
-            (400, 150),   # Right
-            (400, 50),    # Up
-            (600, 50),    # Right
-            (600, 250),   # Long down
-            (400, 250),   # Left
-            (400, 350),   # Down
-            (700, 350),   # Right
-            (700, 450),   # Down
-            (300, 450),   # Long left
-            (300, 550),   # Down
-            (500, 550),   # Right
-            (500, 650),   # Down
-            (800, 650),   # Final stretch
-            (950, 650)    # End
-        ]  # Longer, more complex path with multiple turns
+            (50, 50),    
+            (200, 50),   
+            (200, 150),  
+            (400, 150),   
+            (400, 50),    
+            (600, 50),    
+            (600, 250),   
+            (400, 250),  
+            (400, 350),  
+            (700, 350),   
+            (700, 450),   
+            (300, 450),  
+            (300, 550), 
+            (500, 550),  
+            (500, 650),   
+            (800, 650),   
+            (950, 650)    
+        ]  
         
     def start_wave(self):
         if self.current_wave >= self.max_waves:
@@ -52,7 +52,7 @@ class GameManager:
         
         # Boss waves
         if self.current_wave in [10, 20, 30, 40, 50]:
-            # Set boss wave notification
+            
             self.boss_wave_notification = True
             
             if self.current_wave == 10:
@@ -68,21 +68,21 @@ class GameManager:
         else:
             self.boss_wave_notification = False
         
-        # Regular waves have enemies equal to the wave number
-        num_enemies = min(self.current_wave, 15)  # Cap regular wave enemies at 15
+       
+        num_enemies = min(self.current_wave, 15)  
         
-        # Adjust wave_delay based on wave number
+       
         self.wave_delay = max(500, 1000 - (self.current_wave * 10))
         
-        # Choose enemy types based on wave progression
-        available_enemies = ["rackettra"]  # Always have at least one enemy type
+       
+        available_enemies = ["rackettra"]  
         
         if self.current_wave > 10:
             available_enemies.append("space_rex")
         if self.current_wave > 20:
             available_enemies.append("enviorollante")
         
-        # Generate enemies
+       
         for _ in range(num_enemies):
             enemy_type = random.choice(available_enemies)
             enemies.append((enemy_type, None))
@@ -97,27 +97,27 @@ class GameManager:
             enemy_type, stage = self.enemies_to_spawn.pop(0)
             enemy = None
             
-            # Set wave number for HP scaling
+          
             wave_number = self.current_wave
             
             if enemy_type == "rackettra":
                 enemy = Rackettra(self.path)
                 enemy.wave_number = wave_number
-                # Apply 2x health scaling after round 35
+               
                 if wave_number > 35:
                     enemy.hp *= 2
                     enemy.max_hp *= 2
             elif enemy_type == "space_rex":
                 enemy = SpaceRex(self.path)
                 enemy.wave_number = wave_number
-                # Apply 2x health scaling after round 35
+
                 if wave_number > 35:
                     enemy.hp *= 2
                     enemy.max_hp *= 2
             elif enemy_type == "enviorollante":
                 enemy = Enviorollante(self.path)
                 enemy.wave_number = wave_number
-                # Apply 2x health scaling after round 35
+              
                 if wave_number > 35:
                     enemy.hp *= 2
                     enemy.max_hp *= 2
@@ -150,7 +150,7 @@ class GameManager:
                 self.cash += self._get_enemy_reward(enemy)
                 continue
             
-            # Update enemy and handle any special actions
+           
             enemy_update = enemy.update() if hasattr(enemy, 'update') else None
             if enemy_update:
                 if enemy_update.get("action") == "damage_base":
@@ -159,25 +159,25 @@ class GameManager:
                         self.game_state = "game_over"
                         return
             
-            if enemy.move():  # Returns True if reached end
+            if enemy.move():  
                 self.base_hp -= enemy.damage
                 self.enemies.remove(enemy)
                 if self.base_hp <= 0:
                     self.game_state = "game_over"
                     return
         
-        # Check if wave is complete
+        
         if self.game_state == "playing" and not self.enemies and not self.enemies_to_spawn:
             if self.current_wave == self.max_waves:
                 self.game_state = "victory"
             else:
                 self.game_state = "wave_prep"
-                # Add wave completion reward
+               
                 reward = self._get_wave_completion_reward()
                 self.cash += reward
-                # Signal UI to show reward (will be handled in main.py)
+                
                 self.wave_reward = reward
-                if self.auto_skip:  # Auto-start next wave if enabled
+                if self.auto_skip:  
                     self.start_wave()
     
     def _get_enemy_reward(self, enemy):
@@ -191,10 +191,10 @@ class GameManager:
             return 20
         elif isinstance(enemy, Demolishyah):
             return 50 * enemy.stage
-        return 10  # Default reward
+        return 10  
     
     def _get_wave_completion_reward(self):
-        # Wave completion rewards based on wave ranges
+      
         if self.current_wave < 10:
             return 10
         elif self.current_wave < 20:
@@ -212,19 +212,18 @@ class GameManager:
             start = pygame.math.Vector2(self.path[i])
             end = pygame.math.Vector2(self.path[i + 1])
             
-            # Create a rect for the path segment
-            if start.x == end.x:  # Vertical path
+           
+            if start.x == end.x:  
                 rect = pygame.Rect(
                     start.x - 20, min(start.y, end.y),
                     40, abs(end.y - start.y)
                 )
-            else:  # Horizontal path
+            else:  
                 rect = pygame.Rect(
                     min(start.x, end.x), start.y - 20,
                     abs(end.x - start.x), 40
                 )
             
-            # Check if tower overlaps with path
             tower_rect = pygame.Rect(
                 position[0] - tower_size/2,
                 position[1] - tower_size/2,
@@ -233,7 +232,6 @@ class GameManager:
             if rect.colliderect(tower_rect):
                 return False
         
-        # Check collision with other towers
         for tower in self.towers:
             if (pygame.math.Vector2(position) - tower.position).length() < tower_size:
                 return False
