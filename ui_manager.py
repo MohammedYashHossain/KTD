@@ -31,8 +31,30 @@ class UIManager:
         self.screen_width = screen_width
         self.screen_height = screen_height
         pygame.font.init()
+        pygame.mixer.init()  # Initialize the sound mixer
         self.font = pygame.font.SysFont('Arial', 24)
         self.small_font = pygame.font.SysFont('Arial', 16)
+        self.boss_font = pygame.font.SysFont('Arial', 36, bold=True)
+        self.boss_alert_timer = 0
+        
+        # Load game logo
+        try:
+            self.logo = pygame.image.load("assets/KTD_Logo.png")
+            logo_width = 400
+            logo_height = int(self.logo.get_height() * (logo_width / self.logo.get_width()))
+            self.logo = pygame.transform.scale(self.logo, (logo_width, logo_height))
+        except Exception as e:
+            print(f"Error loading logo: {e}")
+            self.logo = None
+        
+        # Load start game sound
+        try:
+            self.start_sound = pygame.mixer.Sound("assets/Intro_Roar.mp3")
+            # Set volume to 70% to avoid being too loud
+            self.start_sound.set_volume(0.7)
+        except Exception as e:
+            print(f"Error loading roar sound: {e}")
+            self.start_sound = None
         
         # Tower selection panel
         self.tower_buttons = [
@@ -68,10 +90,22 @@ class UIManager:
         self.reward_display_time = 0
     
     def draw_menu(self, screen):
-        # Draw title
-        title = self.font.render("Kaiju Tower Defense", True, (255, 255, 255))
-        title_rect = title.get_rect(center=(self.screen_width//2, self.screen_height//3))
-        screen.blit(title, title_rect)
+        if self.logo:
+            # Draw logo at the top center of the screen
+            logo_rect = self.logo.get_rect(midtop=(self.screen_width//2, 50))
+            screen.blit(self.logo, logo_rect)
+            
+            # Move start button below the logo
+            self.buttons["start"] = Button(
+                self.screen_width//2 - 100,
+                logo_rect.bottom + 50,  # Position button below logo
+                200, 50, "Start Game", (0, 100, 0), (0, 150, 0)
+            )
+        else:
+            # Fallback to text title if no logo
+            title = self.font.render("Kaiju Tower Defense", True, (255, 255, 255))
+            title_rect = title.get_rect(center=(self.screen_width//2, self.screen_height//3))
+            screen.blit(title, title_rect)
         
         # Draw start button
         self.buttons["start"].draw(screen, self.font)
@@ -92,23 +126,50 @@ class UIManager:
         hp_text = self.font.render(f"Base HP: {game_manager.base_hp}", True, (255, 100, 100))
         screen.blit(hp_text, (400, 10))
         
-        # Draw boss wave notification in bottom right if active
-        if hasattr(game_manager, 'boss_wave_notification') and game_manager.boss_wave_notification:
-            boss_text = self.font.render("BOSS WAVE!", True, (255, 0, 0))
-            text_rect = boss_text.get_rect(bottomright=(self.screen_width - 10, self.screen_height - 10))
-            # Draw background for better visibility
-            bg_rect = text_rect.inflate(20, 10)
-            pygame.draw.rect(screen, (0, 0, 0), bg_rect)
-            pygame.draw.rect(screen, (255, 0, 0), bg_rect, 2)
-            screen.blit(boss_text, text_rect)
-        
-        # Always draw auto-skip button
-        self.buttons["auto_skip"].draw(screen, self.font)
-        
         # Draw sell mode indicator
         if self.selling_mode:
             sell_text = self.font.render("SELL MODE", True, (255, 200, 0))
             screen.blit(sell_text, (600, 10))
+        
+        # Draw boss wave notification in bottom left if active
+        if hasattr(game_manager, 'boss_wave_notification') and game_manager.boss_wave_notification:
+            # Update flash timer for text color alternation
+            self.boss_alert_timer = (self.boss_alert_timer + 1) % 60
+            
+            # Flash effect colors
+            if self.boss_alert_timer < 30:  # First half of cycle
+                text_color = (255, 0, 0)  # Red
+                border_color = (255, 165, 0)  # Orange
+            else:  # Second half of cycle
+                text_color = (255, 165, 0)  # Orange
+                border_color = (255, 0, 0)  # Red
+            
+            # Create the alert box
+            boss_text = self.boss_font.render("BOSS WAVE!", True, text_color)
+            wave_info = self.small_font.render(f"Wave {game_manager.current_wave}", True, text_color)
+            
+            # Position the alert box in bottom left
+            text_rect = boss_text.get_rect(bottomleft=(20, self.screen_height - 40))
+            wave_rect = wave_info.get_rect(bottomleft=(20, self.screen_height - 15))
+            
+            # Create background rectangle that encompasses both text elements
+            bg_rect = pygame.Rect(
+                text_rect.left - 10,
+                text_rect.top - 10,
+                max(text_rect.width, wave_rect.width) + 20,
+                (wave_rect.bottom - text_rect.top) + 20
+            )
+            
+            # Draw background and border
+            pygame.draw.rect(screen, (0, 0, 0), bg_rect)  # Black background
+            pygame.draw.rect(screen, border_color, bg_rect, 3)  # Colored border
+            
+            # Draw text
+            screen.blit(boss_text, text_rect)
+            screen.blit(wave_info, wave_rect)
+        
+        # Always draw auto-skip button
+        self.buttons["auto_skip"].draw(screen, self.font)
         
         if game_manager.game_state == "wave_prep":
             self.buttons["next_wave"].draw(screen, self.font)
@@ -146,6 +207,32 @@ class UIManager:
             screen.blit(cost_text, (button_rect.x + 5, button_rect.y + 25))
             
             y += 60
+        
+        # Add controls section under the towers
+        y += 20  # Add some spacing
+        controls_title = self.font.render("Game Controls:", True, (255, 255, 0))
+        screen.blit(controls_title, (self.screen_width - 180, y))
+        
+        y += 30
+        controls = [
+            "Right Click: Toggle Sell Mode",
+            "Left Click: Place Tower",
+            "ESC: Return to Menu",
+            "Auto Skip: Quick Waves"
+        ]
+        
+        for control in controls:
+            control_text = self.small_font.render(control, True, (255, 255, 255))
+            screen.blit(control_text, (self.screen_width - 180, y))
+            y += 20
+        
+        # Add creator credits
+        y += 30  # Extra space before credits
+        credit_text = self.small_font.render("Created by:", True, (255, 255, 0))
+        screen.blit(credit_text, (self.screen_width - 180, y))
+        y += 20
+        creator_text = self.small_font.render("Mohammed Y. Hossain", True, (255, 255, 255))
+        screen.blit(creator_text, (self.screen_width - 180, y))
     
     def draw_tooltip(self, screen):
         if self.tooltip_text:
@@ -189,6 +276,15 @@ class UIManager:
             if event.button == 1:  # Left click
                 if game_manager.game_state == "menu":
                     if self.buttons["start"].rect.collidepoint(event.pos):
+                        # Play roar sound if available
+                        if hasattr(self, 'start_sound') and self.start_sound:
+                            self.start_sound.play()
+                            # Wait for roar to finish before starting background music
+                            roar_length = self.start_sound.get_length()
+                            pygame.time.set_timer(pygame.USEREVENT + 1, int(roar_length * 1000))
+                        else:
+                            # If no roar sound, start music immediately
+                            pygame.mixer.music.play(-1)  # -1 means loop indefinitely
                         game_manager.game_state = "wave_prep"
                         return True
                 
@@ -235,8 +331,78 @@ class UIManager:
             self.buttons["auto_skip"].is_hovered = self.buttons["auto_skip"].rect.collidepoint(event.pos)
             self.update_tooltip(event.pos, game_manager)
         
-        return False 
+        elif event.type == pygame.USEREVENT + 1:  # Custom event for starting background music
+            pygame.mixer.music.play(-1)  # Start background music loop
+            pygame.time.set_timer(pygame.USEREVENT + 1, 0)  # Disable the timer
+        
+        return False
 
     def show_wave_reward(self, amount):
         self.reward_display = f"+${amount} Wave Bonus!"
         self.reward_display_time = pygame.time.get_ticks() 
+
+    def handle_events(self, event, game_manager):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Left click
+                if game_manager.game_state == "menu":
+                    if self.buttons["start"].rect.collidepoint(event.pos):
+                        # Play roar sound if available
+                        if hasattr(self, 'start_sound') and self.start_sound:
+                            self.start_sound.play()
+                            # Wait for roar to finish before starting background music
+                            roar_length = self.start_sound.get_length()
+                            pygame.time.set_timer(pygame.USEREVENT + 1, int(roar_length * 1000))
+                        else:
+                            # If no roar sound, start music immediately
+                            pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+                        game_manager.game_state = "wave_prep"
+                        return True
+                
+                # Handle auto-skip button regardless of game state
+                if self.buttons["auto_skip"].rect.collidepoint(event.pos):
+                    auto_skip = game_manager.toggle_auto_skip()
+                    self.buttons["auto_skip"].text = f"Auto Skip: {'On' if auto_skip else 'Off'}"
+                    return True
+                
+                elif game_manager.game_state == "wave_prep":
+                    # Handle next wave button
+                    if self.buttons["next_wave"].rect.collidepoint(event.pos):
+                        game_manager.start_wave()
+                        return True
+                    
+                    # Handle tower selection
+                    tower_info = self.handle_tower_selection(event.pos, game_manager)
+                    if tower_info:
+                        self.selected_tower = tower_info
+                        self.show_tower_range = True
+                        self.selling_mode = False
+                        return True
+            
+            elif event.button == 3:  # Right click
+                # Toggle selling mode
+                self.selling_mode = not self.selling_mode
+                self.selected_tower = None
+                self.show_tower_range = False
+                return True
+            
+            # Handle tower selling
+            if self.selling_mode and event.button == 1:
+                if game_manager.sell_tower(event.pos):
+                    self.selling_mode = False
+                    return True
+        
+        elif event.type == pygame.MOUSEMOTION:
+            # Update button hover states
+            if game_manager.game_state == "menu":
+                self.buttons["start"].is_hovered = self.buttons["start"].rect.collidepoint(event.pos)
+            elif game_manager.game_state == "wave_prep":
+                self.buttons["next_wave"].is_hovered = self.buttons["next_wave"].rect.collidepoint(event.pos)
+            # Always update auto-skip button hover state
+            self.buttons["auto_skip"].is_hovered = self.buttons["auto_skip"].rect.collidepoint(event.pos)
+            self.update_tooltip(event.pos, game_manager)
+        
+        elif event.type == pygame.USEREVENT + 1:  # Custom event for starting background music
+            pygame.mixer.music.play(-1)  # Start background music loop
+            pygame.time.set_timer(pygame.USEREVENT + 1, 0)  # Disable the timer
+        
+        return False 

@@ -37,8 +37,16 @@ class Game:
         print("Initializing game...")  # Debug output
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Kaiju Tower Defense")
+        pygame.mixer.init()  # Initialize audio
         self.clock = pygame.time.Clock()
         self.running = True
+        
+        # Load and set up background music
+        try:
+            pygame.mixer.music.load("assets/background_music.mp3")
+            pygame.mixer.music.set_volume(0.4)  # Set to 40% volume to not overpower sound effects
+        except Exception as e:
+            print(f"Error loading background music: {e}")
         
         self.game_manager = GameManager()
         self.ui_manager = UIManager(WINDOW_WIDTH, WINDOW_HEIGHT)
