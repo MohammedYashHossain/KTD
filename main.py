@@ -10,10 +10,10 @@ import random
 
 # Created By: Mohammed Hossaim
 
-# Initialize Pygame
+
 pygame.init()
 
-# Constants
+
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 768
 FPS = 60
@@ -23,66 +23,66 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY = (50, 50, 50)
 
-# Asset loading
+
 def load_sprite(filename, size=(40, 40)):
     try:
         image = pygame.image.load(os.path.join('assets', filename))
         return pygame.transform.scale(image, size)
     except:
-        # Create a default colored rectangle if image loading fails
+        
         surface = pygame.Surface(size)
         surface.fill((100, 100, 100))
         return surface
 
 class Game:
     def __init__(self):
-        print("Initializing game...")  # Debug output
+        print("Initializing game...")  
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Kaiju Tower Defense")
         pygame.mixer.init()  # Initialize audio
         self.clock = pygame.time.Clock()
         self.running = True
         
-        # Load and set up background music
+       
         try:
             pygame.mixer.music.load("assets/background_music.mp3")
-            pygame.mixer.music.set_volume(0.4)  # Set to 40% volume to not overpower sound effects
+            pygame.mixer.music.set_volume(0.4)  
         except Exception as e:
             print(f"Error loading background music: {e}")
         
         self.game_manager = GameManager()
         self.ui_manager = UIManager(WINDOW_WIDTH, WINDOW_HEIGHT)
         
-        # Create city background
+      
         self.background = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.create_city_background()
         
-        print("Game initialized successfully")  # Debug output
+        print("Game initialized successfully")  
     
     def create_city_background(self):
-        # Base background color (dark gray)
+        
         self.background.fill((40, 40, 40))
         
-        # Draw roads (lighter gray)
+        
         road_color = (70, 70, 70)
-        # Main roads following the path
+        
         for i in range(len(self.game_manager.path) - 1):
             start = self.game_manager.path[i]
             end = self.game_manager.path[i + 1]
             pygame.draw.line(self.background, road_color, start, end, 40)
         
-        # Building placeholders (various gray tones)
+        
         building_colors = [
-            (60, 60, 65),  # Dark gray
-            (80, 80, 85),  # Medium gray
-            (100, 100, 105),  # Light gray
+            (60, 60, 65),  
+            (80, 80, 85),  
+            (100, 100, 105),  
         ]
         
-        # Add building blocks avoiding the path
+       
         building_sizes = [(60, 60), (80, 80), (100, 100)]
         for x in range(0, WINDOW_WIDTH, 120):
             for y in range(0, WINDOW_HEIGHT, 120):
-                # Check if position is far enough from path
+                
                 can_place = True
                 for i in range(len(self.game_manager.path) - 1):
                     start = pygame.math.Vector2(self.game_manager.path[i])
@@ -128,14 +128,14 @@ class Game:
                         self.running = False
                     else:
                         self.game_manager.game_state = "menu"
-                elif event.key == K_t:  # Change theme
+                elif event.key == K_t:  
                     themes = list(self.backgrounds.keys())
                     current_index = themes.index(self.current_theme)
                     self.current_theme = themes[(current_index + 1) % len(themes)]
             
-            # Handle tower placement
+            
             elif event.type == MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left click
+                if event.button == 1:  
                     if self.ui_manager.selected_tower:
                         mouse_pos = pygame.mouse.get_pos()
                         if self.game_manager.can_place_tower(mouse_pos):
@@ -146,32 +146,32 @@ class Game:
                                 self.game_manager.cash -= tower.cost
                                 self.ui_manager.selected_tower = None
                                 self.ui_manager.show_tower_range = False
-                elif event.button == 3:  # Right click
+                elif event.button == 3: 
                     self.ui_manager.selected_tower = None
                     self.ui_manager.show_tower_range = False
             
             try:
-                # Handle UI events
+                
                 self.ui_manager.handle_events(event, self.game_manager)
             except Exception as e:
-                print(f"Error in UI event handling: {e}")  # Debug output
+                print(f"Error in UI event handling: {e}")  
                 import traceback
                 traceback.print_exc()
     
     def update(self):
-        # Update game state
+        
         previous_state = self.game_manager.game_state
         self.game_manager.update()
         
-        # Check for wave completion and show reward
+       
         if hasattr(self.game_manager, 'wave_reward'):
             self.ui_manager.show_wave_reward(self.game_manager.wave_reward)
             delattr(self.game_manager, 'wave_reward')
         
-        # Update towers and projectiles
+       
         current_time = pygame.time.get_ticks()
         
-        # Update towers
+        
         for tower in self.game_manager.towers:
             if tower.can_shoot(current_time):
                 tower.acquire_target(self.game_manager.enemies)
@@ -223,13 +223,12 @@ class Game:
                         )
                         self.game_manager.effects.append(heal)
         
-        # Update projectiles and check for hits
         for projectile in self.game_manager.projectiles[:]:
             if isinstance(projectile, Beam):
                 if not projectile.update():
                     self.game_manager.projectiles.remove(projectile)
                 else:
-                    # Handle beam damage to all enemies in its path
+                    
                     beam_rect = pygame.Rect(
                         min(projectile.start.x, projectile.end.x),
                         min(projectile.start.y, projectile.end.y),
@@ -238,18 +237,18 @@ class Game:
                     )
                     for enemy in self.game_manager.enemies:
                         if enemy.rect.colliderect(beam_rect):
-                            enemy.take_damage(projectile.damage * 0.1)  # Apply damage per frame (10 times per second)
+                            enemy.take_damage(projectile.damage * 0.1)  
                 continue
             
             if projectile.update():
-                # Handle projectile hit
+                
                 for enemy in self.game_manager.enemies:
                     if enemy.rect.colliderect(projectile.rect):
                         enemy.take_damage(projectile.damage)
                         if isinstance(projectile, Maser):
                             enemy.effects.update(projectile.effect)
                         elif isinstance(projectile, Missile):
-                            # Handle AOE damage
+                            
                             for other_enemy in self.game_manager.enemies:
                                 if other_enemy != enemy:
                                     distance = (other_enemy.position - enemy.position).length()
@@ -267,39 +266,37 @@ class Game:
                 for tower in self.game_manager.towers:
                     distance = (tower.position - effect.position).length()
                     if distance <= effect.range:
-                        # Implement tower healing if we add tower HP later
+                       
                         pass
     
     def draw(self):
-        # Draw background
+        
         self.screen.blit(self.background, (0, 0))
         
-        # Draw path highlights
         for i in range(len(self.game_manager.path) - 1):
             start_pos = self.game_manager.path[i]
             end_pos = self.game_manager.path[i + 1]
-            # Draw path border
+          
             pygame.draw.line(self.screen, (100, 100, 100), start_pos, end_pos, 42)
-            # Draw path center
+          
             pygame.draw.line(self.screen, (80, 80, 80), start_pos, end_pos, 40)
-        
-        # Draw towers
+
         for tower in self.game_manager.towers:
             tower.draw(self.screen, self.ui_manager.show_tower_range)
         
-        # Draw enemies
+       
         for enemy in self.game_manager.enemies:
             enemy.draw(self.screen)
         
-        # Draw projectiles
+        
         for projectile in self.game_manager.projectiles:
             projectile.draw(self.screen)
         
-        # Draw effects
+       
         for effect in self.game_manager.effects:
             effect.draw(self.screen)
         
-        # Draw tower placement preview
+        
         if self.ui_manager.selected_tower:
             mouse_pos = pygame.mouse.get_pos()
             preview_color = (0, 255, 0, 128) if self.game_manager.can_place_tower(mouse_pos) else (255, 0, 0, 128)
@@ -313,7 +310,7 @@ class Game:
                 pygame.draw.circle(self.screen, (100, 100, 100, 64),
                                  mouse_pos, tower.range, 1)
         
-        # Draw UI
+        
         if self.game_manager.game_state == "menu":
             self.ui_manager.draw_menu(self.screen)
         else:
@@ -321,7 +318,6 @@ class Game:
             self.ui_manager.draw_tower_panel(self.screen, self.game_manager)
             self.ui_manager.draw_tooltip(self.screen)
         
-        # Draw game over or victory screen
         if self.game_manager.game_state in ["game_over", "victory"]:
             surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
             surface.fill((0, 0, 0, 128))
@@ -336,7 +332,7 @@ class Game:
         pygame.display.flip()
     
     def run(self):
-        print("Starting game loop...")  # Debug output
+        print("Starting game loop...")  
         while self.running:
             try:
                 self.handle_events()
@@ -344,13 +340,13 @@ class Game:
                 self.draw()
                 self.clock.tick(FPS)
             except Exception as e:
-                print(f"Error in game loop: {e}")  # Debug output
+                print(f"Error in game loop: {e}")  
                 import traceback
                 traceback.print_exc()
                 self.running = False
 
 def main():
-    # Create assets directory if it doesn't exist
+    
     if not os.path.exists('assets'):
         os.makedirs('assets')
         
