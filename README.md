@@ -1,88 +1,165 @@
-# Kaiju Tower Defense 🎮
+# <h1 align="center">🎮 Kaiju Tower Defense</h1>
 
-A Python-based tower defense game featuring giant monsters (kaiju) and strategic defense mechanics. Built with Pygame, this project demonstrates object-oriented programming, game development, and real-time system design.
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img alt="Pygame" src="https://img.shields.io/badge/Pygame-2ea44f?style=for-the-badge"/>
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge"/>
+</p>
 
-## 🌟 Features
+<p align="center">
+  A strategic tower defense game featuring giant monsters (kaiju) and advanced defense mechanics. Built with Python and Pygame, showcasing object-oriented programming, game development, and real-time system design.
+</p>
 
-- **Dynamic Combat System**: Multiple tower types with unique abilities and attack patterns
-- **Strategic Gameplay**: Various enemy types with different behaviors and abilities
-- **Boss Battles**: Special boss waves featuring powerful kaiju
-- **Resource Management**: Economy system for tower placement and upgrades
-- **Modern UI/UX**: Clean interface with informative HUD and tooltips
-- **Audio Integration**: Background music and sound effects for immersive gameplay
+---
 
-## 🛠️ Technical Highlights
+### 🌟 Key Features
 
-- **Object-Oriented Design**: Modular architecture with clear separation of concerns
-- **Event System**: Robust event handling for game state management
-- **Collision Detection**: Efficient implementation of hitbox and projectile systems
-- **Path Finding**: Enemy movement system with predefined paths
-- **Resource Management**: Memory-efficient asset loading and management
-- **Performance Optimization**: Efficient rendering and update cycles
+<table>
+<tr>
+<td>
 
-## 🔧 Technologies Used
+#### Combat System
+- Multiple tower types
+- Unique attack patterns
+- Special abilities
+- AOE damage
 
-- Python 3.x
-- Pygame
-- Vector2D Mathematics
-- Asset Management
-- Event Systems
+</td>
+<td>
 
-## 🎯 Learning Outcomes
+#### Enemy Types
+- Various kaiju monsters
+- Boss battles
+- Special abilities
+- Health scaling
 
-- Game development architecture and patterns
-- Real-time system design and optimization
-- Object-oriented programming principles
-- Event-driven programming
-- Asset management and resource handling
-- User interface design
-- Audio integration in gaming applications
+</td>
+<td>
 
-## 🚀 Getting Started
+#### Game Systems
+- Resource management
+- Wave progression
+- Path finding
+- Audio integration
 
-1. Clone the repository
+</td>
+</tr>
+</table>
+
+### 🛠️ Technical Architecture
+
+<table>
+<tr>
+<td>
+
+#### Core Systems
+- Object-oriented design
+- Event handling
+- Collision detection
+- Resource management
+
+</td>
+<td>
+
+#### Performance
+- Efficient rendering
+- Memory management
+- Asset optimization
+- Frame rate control
+
+</td>
+<td>
+
+#### UI/UX
+- Clean interface
+- Informative HUD
+- Interactive tooltips
+- Visual feedback
+
+</td>
+</tr>
+</table>
+
+### 💻 Technologies
+
+![Python](https://img.shields.io/badge/-Python-3776AB?style=flat&logo=python&logoColor=white)
+![Pygame](https://img.shields.io/badge/-Pygame-2ea44f?style=flat)
+![Vector2D](https://img.shields.io/badge/-Vector2D-orange?style=flat)
+![OOP](https://img.shields.io/badge/-OOP-blue?style=flat)
+![Event Systems](https://img.shields.io/badge/-Event%20Systems-red?style=flat)
+
+### 🚀 Getting Started
+
+1. **Clone the Repository**
 ```bash
 git clone https://github.com/yourusername/kaiju-tower-defense.git
 cd kaiju-tower-defense
 ```
 
-2. Install dependencies
+2. **Install Dependencies**
 ```bash
-pip install pygame
+pip install -r requirements.txt
 ```
 
-3. Run the game
+3. **Launch the Game**
 ```bash
 python main.py
 ```
 
-## 🎮 Game Controls
+### 🎮 Controls
 
-- Left Click: Place towers/Select menu items
-- Right Click: Cancel tower placement/Toggle sell mode
+<table>
+<tr>
+<td>
+
+#### Basic Controls
+- Left Click: Place towers
+- Right Click: Toggle sell mode
 - ESC: Return to menu
-- Auto Skip: Toggle wave auto-progression
 
-## 🏗️ Project Structure
+</td>
+<td>
+
+#### Game Management
+- Auto Skip: Quick waves
+- Tower Selection: Shop panel
+- Sell Mode: Right click
+
+</td>
+</tr>
+</table>
+
+### 📁 Project Structure
 
 ```
 kaiju-tower-defense/
-├── main.py           # Game entry point and main loop
-├── game_manager.py   # Game state and logic management
-├── ui_manager.py     # User interface handling
-├── tower.py         # Tower classes and mechanics
-├── enemy.py         # Enemy classes and behaviors
-├── projectile.py    # Projectile system
-└── assets/          # Game assets (images, sounds)
+├── 🎯 main.py           # Game entry and main loop
+├── ⚙️ game_manager.py   # Core game logic
+├── 🖥️ ui_manager.py     # UI/UX handling
+├── 🗼 tower.py         # Tower mechanics
+├── 👾 enemy.py         # Enemy behaviors
+├── 🎯 projectile.py    # Projectile system
+└── 🎨 assets/          # Game resources
 ```
 
-## 👨‍💻 Developer
+### 👨‍💻 Developer
 
-Mohammed Y. Hossain
+<p align="center">
+  <b>Mohammed Y. Hossain</b><br>
+  <a href="https://mohammedyhossain-portfolio.vercel.app/"><img alt="Portfolio" src="https://img.shields.io/badge/Portfolio-View-red?style=flat-square"/></a>
+  <a href="https://www.linkedin.com/in/mohammedyhossain/"><img alt="LinkedIn" src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin"/></a>
+  <a href="mailto:mohossain.swe@gmail.com"><img alt="Email" src="https://img.shields.io/badge/Email-Contact-D14836?style=flat-square&logo=gmail&logoColor=white"/></a>
+</p>
 
-## 📝 License
+### 📈 Project Stats
 
-This project is open source and available under the [MIT License](LICENSE).
+![GitHub language count](https://img.shields.io/github/languages/count/yourusername/kaiju-tower-defense?style=flat-square)
+![GitHub top language](https://img.shields.io/github/languages/top/yourusername/kaiju-tower-defense?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/kaiju-tower-defense?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/yourusername/kaiju-tower-defense?style=flat-square)
 
 ---
-*Note: This project was developed as a demonstration of game development skills and software engineering principles.* 
+
+<p align="center">
+  <i>This project was developed as a demonstration of game development and software engineering principles.</i>
+</p> 
