@@ -1,4 +1,4 @@
-# <h1 align="center">🎮 Kaiju Tower Defense</h1>
+# <h1 align="center"> Kaiju Tower Defense</h1>
 
 <p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
@@ -7,12 +7,12 @@
 </p>
 
 <p align="center">
-  A strategic tower defense game featuring giant monsters (kaiju) and advanced defense mechanics. Built with Python and Pygame, showcasing object-oriented programming, game development, and real-time system design.
+  I have created a tower defense game based on my love for Kaiju. I built it with Python and Pygame, showcasing object-oriented programming, game development, and real-time system design.
 </p>
 
 ---
 
-### 🌟 Key Features
+###  Key Features
 
 <table>
 <tr>
@@ -28,7 +28,7 @@
 <td>
 
 #### Enemy Types
-- Various kaiju monsters
+- Various kaiju monsters (based on the Godzilla franchise)
 - Boss battles
 - Special abilities
 - Health scaling
@@ -46,7 +46,7 @@
 </tr>
 </table>
 
-### 🛠️ Technical Architecture
+###  Technical Architecture
 
 <table>
 <tr>
@@ -71,7 +71,7 @@
 <td>
 
 #### UI/UX
-- Clean interface
+- Clean retro interface
 - Informative HUD
 - Interactive tooltips
 - Visual feedback
@@ -80,7 +80,7 @@
 </tr>
 </table>
 
-### 💻 Technologies
+###  Technologies
 
 ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat&logo=python&logoColor=white)
 ![Pygame](https://img.shields.io/badge/-Pygame-2ea44f?style=flat)
@@ -88,7 +88,7 @@
 ![OOP](https://img.shields.io/badge/-OOP-blue?style=flat)
 ![Event Systems](https://img.shields.io/badge/-Event%20Systems-red?style=flat)
 
-### 🚀 Getting Started
+###  Getting Started
 
 1. **Clone the Repository**
 ```bash
@@ -106,7 +106,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### 🎮 Controls
+### Controls
 
 <table>
 <tr>
@@ -129,7 +129,7 @@ python main.py
 </tr>
 </table>
 
-### 📁 Project Structure
+### Project Structure
 
 ```
 kaiju-tower-defense/
@@ -142,7 +142,7 @@ kaiju-tower-defense/
 └── 🎨 assets/          # Game resources
 ```
 
-### 👨‍💻 Developer
+### Developer
 
 <p align="center">
   <b>Mohammed Y. Hossain</b><br>
@@ -151,12 +151,6 @@ kaiju-tower-defense/
   <a href="mailto:mohossain.swe@gmail.com"><img alt="Email" src="https://img.shields.io/badge/Email-Contact-D14836?style=flat-square&logo=gmail&logoColor=white"/></a>
 </p>
 
-### 📈 Project Stats
-
-![GitHub language count](https://img.shields.io/github/languages/count/yourusername/kaiju-tower-defense?style=flat-square)
-![GitHub top language](https://img.shields.io/github/languages/top/yourusername/kaiju-tower-defense?style=flat-square)
-![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/kaiju-tower-defense?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/yourusername/kaiju-tower-defense?style=flat-square)
 
 ---
 
