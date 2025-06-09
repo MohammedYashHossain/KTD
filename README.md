@@ -1,13 +1,14 @@
-# <h1 align="center"> Kaiju Tower Defense</h1>
+# <h1 align="center"> KTD - Kaiju Tower Defense</h1>
 
 <p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
   <img alt="Pygame" src="https://img.shields.io/badge/Pygame-2ea44f?style=for-the-badge"/>
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge"/>
+  <img alt="Repository" src="https://img.shields.io/badge/GitHub-MohammedYashHossain-181717?style=for-the-badge&logo=github"/>
 </p>
 
 <p align="center">
-  I have created a tower defense game based on my love for Kaiju. I built it with Python and Pygame, showcasing object-oriented programming, game development, and real-time system design.
+  A tower defense game based on my love for Kaiju. Built with Python and Pygame, showcasing object-oriented programming, game development, and real-time system design.
 </p>
 
 ---
@@ -109,11 +110,11 @@
 2. **Clone or Download the Repository**
    - Option 1: Clone using Git
    ```bash
-   git clone https://github.com/yourusername/kaiju-tower-defense.git
-   cd kaiju-tower-defense
+   git clone https://github.com/MohammedYashHossain/KTD.git
+   cd KTD
    ```
    - Option 2: Download ZIP
-     - Download the ZIP file from the repository
+     - Download the ZIP file from [https://github.com/MohammedYashHossain/KTD](https://github.com/MohammedYashHossain/KTD)
      - Extract it to your desired location
      - Open terminal/command prompt in the extracted folder
 
@@ -179,7 +180,7 @@ For additional help, please create an issue on the repository.
 ### Project Structure
 
 ```
-kaiju-tower-defense/
+KTD/
 ├── 🎯 main.py           # Game entry and main loop
 ├── ⚙️ game_manager.py   # Core game logic
 ├── 🖥️ ui_manager.py     # UI/UX handling
