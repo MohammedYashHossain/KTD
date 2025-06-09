@@ -90,21 +90,68 @@
 
 ###  Getting Started
 
-1. **Clone the Repository**
-```bash
-git clone https://github.com/yourusername/kaiju-tower-defense.git
-cd kaiju-tower-defense
-```
+#### System Requirements
+- Python 3.8 or higher
+- Windows, macOS, or Linux operating system
+- Minimum 2GB RAM
+- Graphics card with OpenGL support
 
-2. **Install Dependencies**
-```bash
-pip install -r requirements.txt
-```
+#### Installation Steps
 
-3. **Launch the Game**
-```bash
-python main.py
-```
+1. **Install Python**
+   - Download and install Python from [python.org](https://python.org)
+   - Make sure to check "Add Python to PATH" during installation
+   - Verify installation by opening a terminal/command prompt and typing:
+   ```bash
+   python --version
+   ```
+
+2. **Clone or Download the Repository**
+   - Option 1: Clone using Git
+   ```bash
+   git clone https://github.com/yourusername/kaiju-tower-defense.git
+   cd kaiju-tower-defense
+   ```
+   - Option 2: Download ZIP
+     - Download the ZIP file from the repository
+     - Extract it to your desired location
+     - Open terminal/command prompt in the extracted folder
+
+3. **Install Dependencies**
+   ```bash
+   # For Windows
+   python -m pip install -r requirements.txt
+   
+   # For macOS/Linux
+   python3 -m pip install -r requirements.txt
+   ```
+
+4. **Launch the Game**
+   ```bash
+   # For Windows
+   python main.py
+   
+   # For macOS/Linux
+   python3 main.py
+   ```
+
+#### Troubleshooting
+
+- If `python` command is not found:
+  - Make sure Python is installed correctly
+  - Try using `py` instead of `python` on Windows
+  - Check if Python is added to your system's PATH
+
+- If you get pygame installation errors:
+  - Try updating pip: `python -m pip install --upgrade pip`
+  - Install pygame separately: `python -m pip install pygame`
+
+- If the game window doesn't appear:
+  - Check if your graphics drivers are up to date
+  - Make sure you have OpenGL support
+  - Try running in a different terminal/command prompt
+
+For additional help, please create an issue on the repository.
 
 ### Controls
 
