@@ -54,7 +54,7 @@ class Tower:
 
 class Type90Tank(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=8, range=100, fire_rate=1.0, cost=100)
+        super().__init__(x, y, damage=10, range=100, fire_rate=1.0, cost=100)
         try:
             self.sprite = pygame.image.load("assets/type_90_tank.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))
@@ -73,7 +73,7 @@ class Type90Tank(Tower):
 
 class MaserCannon(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=5, range=150, fire_rate=1.5, cost=150)
+        super().__init__(x, y, damage=8, range=150, fire_rate=1.5, cost=150)
         try:
             self.sprite = pygame.image.load("assets/maser_canon.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))
@@ -93,7 +93,7 @@ class MaserCannon(Tower):
 
 class RoboRex(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=20, range=120, fire_rate=2.0, cost=250)
+        super().__init__(x, y, damage=50, range=150, fire_rate=2.0, cost=250)
         try:
             self.sprite = pygame.image.load("assets/robo_rex.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))
@@ -136,7 +136,7 @@ class RoboRex(Tower):
 
 class Butterflya(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=3, range=250, fire_rate=0.5, cost=180)  # Reduced damage from 4 to 3
+        super().__init__(x, y, damage=2, range=250, fire_rate=0.5, cost=180)  # Reduced damage from 4 to 3
         try:
             self.sprite = pygame.image.load("assets/butterflya.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))
@@ -157,7 +157,7 @@ class Butterflya(Tower):
 
 class LordRex(Tower):
     def __init__(self, x, y):
-        super().__init__(x, y, damage=80, range=200, fire_rate=6.0, cost=750)  # Increased fire_rate from 4.0 to 6.0 seconds, increased damage to compensate
+        super().__init__(x, y, damage=80, range=170, fire_rate=6.0, cost=750)  # Increased fire_rate from 4.0 to 6.0 seconds, increased damage to compensate
         try:
             self.sprite = pygame.image.load("assets/lord_rex.png")
             self.sprite = pygame.transform.scale(self.sprite, (40, 40))

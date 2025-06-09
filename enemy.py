@@ -83,7 +83,7 @@ class Rackettra(Enemy):
 
 class SpaceRex(Enemy):
     def __init__(self, path):
-        super().__init__(path, hp=180, speed=1.0, damage=20)  # Increased speed from 0.7 to 1.0 (still slower than Rackettra's 2.0)
+        super().__init__(path, hp=180, speed=1.5, damage=20)  # Increased speed from 0.7 to 1.0 (still slower than Rackettra's 2.0)
         self.crystal_spawn_timer = 0
         try:
             self.sprite = pygame.image.load("assets/Space_Rex.png")
@@ -208,7 +208,7 @@ class Demolishyah(Enemy):
     def __init__(self, path, stage=1):
         # Significantly increased HP for each stage
         hp = 800 * stage  # Increased from 600 * stage
-        speed = 0.6 + (stage * 0.15)
+        speed = 1 + (stage * 0.15)
         damage = 50 * stage
         super().__init__(path, hp=hp, speed=speed, damage=damage)
         self.stage = stage
