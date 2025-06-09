@@ -70,7 +70,7 @@ class GameManager:
             self.boss_wave_notification = False
         
         # Regular waves have enemies equal to the wave number
-        num_enemies = min(self.current_wave, 15)  # Cap regular wave enemies at 15
+        num_enemies = self.current_wave  # Remove the min() cap to allow unlimited enemies
         
         # Adjust wave_delay based on wave number
         self.wave_delay = max(500, 1000 - (self.current_wave * 10))
